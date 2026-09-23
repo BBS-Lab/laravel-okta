@@ -2,8 +2,6 @@
 
 All notable changes to `bbs-lab/laravel-okta` will be documented in this file.
 
-## Unreleased
-
 ## v1.0.0 - 2026-09-23
 
 Framework-agnostic base for Okta SSO on Laravel. Extracted from `bbs-lab/nova-okta` so Nova and Filament (and any custom panel) share one Okta flow.
