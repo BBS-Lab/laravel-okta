@@ -1,0 +1,21 @@
+laravel: '@testbench'
+
+providers:
+  - Workbench\App\Providers\WorkbenchServiceProvider
+
+migrations:
+  - workbench/database/migrations
+
+workbench:
+  build:
+    - package:discover
+    - create-sqlite-db
+    - db:wipe
+    - migrate:refresh
+    - db:seed:
+        --class: 'Workbench\Database\Seeders\DatabaseSeeder'
+  sync: []
+
+purge:
+  directories:
+    - lang/*

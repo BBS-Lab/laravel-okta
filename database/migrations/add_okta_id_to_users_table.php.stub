@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Optional: adds the stable-identifier column used by okta.identifier.column.
+ * Publish with `php artisan vendor:publish --tag=okta-migrations`, then adjust
+ * the table/column name if your config uses something other than users.okta_id.
+ */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table): void {
+            // The Okta "sub" is matched first, so it must be UNIQUE.
+            $table->string('okta_id')->nullable()->unique()->after('password');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table): void {
+            $table->dropColumn('okta_id');
+        });
+    }
+};

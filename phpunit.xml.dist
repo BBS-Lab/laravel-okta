@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true"
+         failOnEmptyTestSuite="true"
+         beStrictAboutOutputDuringTests="true"
+         executionOrder="random">
+    <testsuites>
+        <!-- Browser tests (Pest v4 + Playwright) are excluded from the default
+             suite so the suite runs without a browser; run them with
+             `composer test:browser` (Playwright required). -->
+        <testsuite name="Tests">
+            <directory>tests</directory>
+            <exclude>tests/Browser</exclude>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+    <php>
+        <!-- A fixed key so session/cookie encryption works while the SSO flow
+             (Socialite state, Auth::login, session regeneration) is exercised. -->
+        <env name="APP_KEY" value="base64:2fl+Ktvkfl+Fuz4Qp/A75G2RTiWVA/ZoKZvp6fiiM10="/>
+        <!-- Array session driver so logout's invalidate()/regenerate() never
+             touches the cookie handler (which needs a bound request). -->
+        <env name="SESSION_DRIVER" value="array"/>
+        <!-- Isolate the suite in an in-memory database so running tests never
+             wipes the file-based DB used by `composer serve`. -->
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+    </php>
+</phpunit>

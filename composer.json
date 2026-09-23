@@ -1,0 +1,102 @@
+{
+    "name": "bbs-lab/laravel-okta",
+    "description": "Framework-agnostic Okta SSO for Laravel: the Socialite Okta driver, login/callback/logout flow, lifecycle hooks and a pluggable panel seam that the nova-okta and filament-okta adapters build on.",
+    "keywords": [
+        "BBS",
+        "laravel",
+        "okta",
+        "sso",
+        "socialite",
+        "oauth",
+        "oidc",
+        "authentication"
+    ],
+    "homepage": "https://github.com/BBS-Lab/laravel-okta",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "BBS",
+            "email": "paris@big-boss-studio.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/database": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/http": "^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^11.0 || ^12.0 || ^13.0",
+        "laravel/socialite": "^5.0",
+        "socialiteproviders/okta": "^4.4",
+        "spatie/laravel-package-tools": "^1.16"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.18",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+        "orchestra/workbench": "^9.0 || ^10.0 || ^11.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-arch": "^4.0",
+        "pestphp/pest-plugin-browser": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "pestphp/pest-plugin-mutate": "^4.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BBSLab\\LaravelOkta\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BBSLab\\LaravelOkta\\Tests\\": "tests/",
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "BBSLab\\LaravelOkta\\LaravelOktaServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "analyse": "vendor/bin/phpstan analyse",
+        "test": "vendor/bin/pest",
+        "test:browser": "vendor/bin/pest tests/Browser",
+        "test-coverage": "XDEBUG_MODE=coverage vendor/bin/pest --coverage --min=100",
+        "test-mutation": "XDEBUG_MODE=coverage vendor/bin/pest --mutate --everything --covered-only --min=80",
+        "e2e": "npx playwright test",
+        "format": "vendor/bin/pint",
+        "lint": [
+            "@php vendor/bin/pint --ansi",
+            "@php vendor/bin/phpstan analyse --verbose --ansi"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

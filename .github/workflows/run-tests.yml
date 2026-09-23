@@ -1,0 +1,55 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Primary target: latest everything, enforces 100% coverage.
+          - { name: 'Laravel 13 / PHP 8.4', php: '8.4', extra: '', coverage: true }
+          # Latest Laravel on the lowest PHP it supports.
+          - { name: 'Laravel 13 / PHP 8.3', php: '8.3', extra: '', coverage: false }
+          # Laravel 12.
+          - { name: 'Laravel 12 / PHP 8.4', php: '8.4', extra: '--with=laravel/framework:^12.0 --with=orchestra/testbench:^10.0', coverage: false }
+          # Lowest supported Laravel. Runtime floor is PHP 8.2, but Pest 4 (dev)
+          # requires 8.3, so 8.3 is the lowest CI can exercise.
+          - { name: 'Laravel 11 / PHP 8.3', php: '8.3', extra: '--with=laravel/framework:^11.0 --with=orchestra/testbench:^9.0', coverage: false }
+
+    name: ${{ matrix.name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, intl, fileinfo
+          coverage: pcov
+
+      # Testing an older Laravel line (e.g. 11.x) can hit versions flagged by
+      # security advisories; the CI matrix tests compatibility, so don't block on them.
+      - name: Allow advisory-affected versions in the CI matrix
+        run: composer config --global policy.advisories.block false
+
+      - name: Install Composer dependencies
+        run: composer update ${{ matrix.extra }} --prefer-dist --no-interaction --no-progress
+
+      # Excludes the "browser" group (Pest v4 + Playwright) — those run locally / e2e, not in CI.
+      - name: Run tests
+        run: ${{ matrix.coverage && 'composer test-coverage' || 'composer test' }}

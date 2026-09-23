@@ -1,0 +1,33 @@
+name: phpstan
+
+on:
+  push:
+    branches: [main]
+    paths: ['**.php', 'phpstan.neon.dist', 'phpstan-baseline.neon']
+  pull_request:
+    branches: [main]
+    paths: ['**.php', 'phpstan.neon.dist', 'phpstan-baseline.neon']
+  workflow_dispatch:
+
+jobs:
+  phpstan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Allow advisory-affected versions in CI
+        run: composer config --global policy.advisories.block false
+
+      - name: Install Composer dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run PHPStan
+        run: composer analyse -- --error-format=github
