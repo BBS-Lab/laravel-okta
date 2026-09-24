@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace BBSLab\LaravelOkta\Tests;
 
+use BBSLab\LaravelForceTwoFactor\LaravelForceTwoFactorServiceProvider;
 use BBSLab\LaravelOkta\LaravelOktaServiceProvider;
+use BBSLab\LaravelPasswordRotation\LaravelPasswordRotationServiceProvider;
 use Illuminate\Foundation\Application;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -26,6 +28,10 @@ abstract class TestCase extends Orchestra
             // is a deferred provider, so register it explicitly in the isolated
             // harness — it binds the Socialite factory and dispatches SocialiteWasCalled.
             SocialiteManagerServiceProvider::class,
+            // The forced-2FA + password-rotation bases: bind the registries the
+            // package's boot-time SSO bypass registrations land in.
+            LaravelForceTwoFactorServiceProvider::class,
+            LaravelPasswordRotationServiceProvider::class,
             LaravelOktaServiceProvider::class,
             // Registered last so its OktaPanel binding wins over the base default,
             // and its boot() mounts the Okta routes for that panel.

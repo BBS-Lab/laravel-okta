@@ -2,6 +2,16 @@
 
 All notable changes to `bbs-lab/laravel-okta` will be documented in this file.
 
+## v1.1.0 - 2026-09-24
+
+### ✨ Added
+
+- Optional interop: Okta-authenticated sessions (`okta_authenticated`) are automatically exempted from the bbs-lab forced-security gates when those packages are installed —
+  - from forced **2FA** enrolment ([bbs-lab/laravel-force-two-factor](https://github.com/BBS-Lab/laravel-force-two-factor)): their second factor is enforced by Okta;
+  - from forced **password rotation** ([bbs-lab/laravel-password-rotation](https://github.com/BBS-Lab/laravel-password-rotation)): SSO users have no local password to rotate.
+
+  Both are soft `class_exists` integrations (a no-op when the package is absent, no new hard dependency).
+
 ## v1.0.0 - 2026-09-23
 
 Framework-agnostic base for Okta SSO on Laravel. Extracted from `bbs-lab/nova-okta` so Nova and Filament (and any custom panel) share one Okta flow.

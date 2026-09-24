@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace BBSLab\LaravelOkta;
 
+use BBSLab\LaravelForceTwoFactor\Facades\ForceTwoFactor;
 use BBSLab\LaravelOkta\Contracts\OktaPanel;
 use BBSLab\LaravelOkta\Contracts\OktaUserResolver;
+use BBSLab\LaravelOkta\Http\Controllers\OktaController;
 use BBSLab\LaravelOkta\Resolvers\DefaultOktaUserResolver;
 use BBSLab\LaravelOkta\Support\NullOktaPanel;
+use BBSLab\LaravelPasswordRotation\Facades\PasswordRotation;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 use SocialiteProviders\Okta\Provider;
@@ -51,5 +56,30 @@ class LaravelOktaServiceProvider extends PackageServiceProvider
         Event::listen(function (SocialiteWasCalled $event): void {
             $event->extendSocialite('okta', Provider::class);
         });
+    }
+
+    public function packageBooted(): void
+    {
+        $this->registerSsoSecurityBypasses();
+    }
+
+    /**
+     * When the bbs-lab force-two-factor / password-rotation packages are installed,
+     * exempt Okta-authenticated users from BOTH forced 2FA enrolment and forced
+     * password rotation: their second factor is enforced by Okta, and they have no
+     * local password to rotate. Soft integrations — a no-op when a package is absent.
+     */
+    protected function registerSsoSecurityBypasses(): void
+    {
+        $authenticatedViaOkta = fn (Request $request, Authenticatable $user): bool => $request->hasSession()
+            && $request->session()->get(OktaController::AUTHENTICATED_SESSION_KEY) === true;
+
+        if (class_exists(ForceTwoFactor::class)) {
+            ForceTwoFactor::bypass($authenticatedViaOkta);
+        }
+
+        if (class_exists(PasswordRotation::class)) {
+            PasswordRotation::bypass($authenticatedViaOkta);
+        }
     }
 }
