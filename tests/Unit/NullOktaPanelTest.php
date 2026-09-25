@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use BBSLab\LaravelOkta\Enums\OktaRoute;
 use BBSLab\LaravelOkta\Support\NullOktaPanel;
 use Illuminate\Http\Request;
 
@@ -37,6 +38,36 @@ it('treats an empty identifier column as none', function (): void {
     config(['okta.identifier.column' => '']);
 
     expect((new NullOktaPanel)->identifierColumn())->toBeNull();
+});
+
+it('mounts each okta route at its default authorization path', function (): void {
+    $panel = new NullOktaPanel;
+
+    expect($panel->path(OktaRoute::Login))->toBe('authorization-code/redirect')
+        ->and($panel->path(OktaRoute::Callback))->toBe('authorization-code/callback')
+        ->and($panel->path(OktaRoute::Logout))->toBe('authorization-code/logout')
+        ->and($panel->path(OktaRoute::CallbackLogout))->toBe('authorization-code/callback/logout');
+});
+
+it('reads a configured path over the default', function (): void {
+    config(['okta.paths.login' => 'sso/start']);
+
+    expect((new NullOktaPanel)->path(OktaRoute::Login))->toBe('sso/start');
+});
+
+it('trims surrounding slashes from a configured path', function (): void {
+    config(['okta.paths.callback' => '/sso/cb/']);
+
+    expect((new NullOktaPanel)->path(OktaRoute::Callback))->toBe('sso/cb');
+});
+
+it('falls back to the default path when the configured value is empty or not a string', function (): void {
+    config(['okta.paths.login' => '', 'okta.paths.callback' => ['not-a-string']]);
+
+    $panel = new NullOktaPanel;
+
+    expect($panel->path(OktaRoute::Login))->toBe('authorization-code/redirect')
+        ->and($panel->path(OktaRoute::Callback))->toBe('authorization-code/callback');
 });
 
 it('casts truthy non-boolean okta settings to a strict boolean', function (): void {

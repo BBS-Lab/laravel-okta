@@ -26,7 +26,7 @@ class WorkbenchServiceProvider extends ServiceProvider
             'services.okta' => [
                 'client_id' => 'demo-client-id',
                 'client_secret' => 'demo-client-secret',
-                // Left unset: the redirect_uri is derived from the okta/callback route.
+                // Left unset: the redirect_uri is derived from the callback route.
                 'redirect' => env('OKTA_REDIRECT_URI'),
                 'base_url' => 'https://example.okta.com',
             ],
@@ -37,7 +37,7 @@ class WorkbenchServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(dirname(__DIR__, 2).'/resources/views', 'workbench');
 
-        // Mount the base okta/* routes for the default (plain-application) panel.
+        // Mount the Okta routes for the default (plain-application) panel.
         OktaRoutes::register(new NullOktaPanel);
 
         // The login screen the default panel returns to (NullOktaPanel::loginUrl()).

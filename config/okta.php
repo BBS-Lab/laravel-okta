@@ -2,7 +2,30 @@
 
 declare(strict_types=1);
 
+use BBSLab\LaravelOkta\Enums\OktaRoute;
+
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Okta route paths
+    |--------------------------------------------------------------------------
+    |
+    | The URI each Okta route mounts at, relative to the panel's route prefix
+    | (empty for the base package, the panel path for an adapter). 'login' is the
+    | URL your Okta button points at — it starts the redirect to Okta; 'callback'
+    | is the OIDC redirect_uri you whitelist in your Okta application. Change these
+    | to move the endpoints — the route names never change, so route() callers keep
+    | working. For Filament, set them per panel with OktaPlugin::make()->paths(...).
+    |
+    */
+
+    'paths' => [
+        'login' => env('OKTA_LOGIN_PATH', OktaRoute::Login->defaultPath()),
+        'callback' => env('OKTA_CALLBACK_PATH', OktaRoute::Callback->defaultPath()),
+        'logout' => env('OKTA_LOGOUT_PATH', OktaRoute::Logout->defaultPath()),
+        'callback_logout' => env('OKTA_CALLBACK_LOGOUT_PATH', OktaRoute::CallbackLogout->defaultPath()),
+    ],
 
     /*
     |--------------------------------------------------------------------------

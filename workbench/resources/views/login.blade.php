@@ -51,7 +51,7 @@
             <p class="error" id="okta-error">{{ $error }}</p>
         @endif
 
-        {{-- How a consumer wires the button: link it at the base okta/login route. --}}
+        {{-- How a consumer wires the button: link it at the panel's login route. --}}
         <a href="{{ route('okta.login') }}" id="okta-login" class="okta">
             Log In with Okta
         </a>

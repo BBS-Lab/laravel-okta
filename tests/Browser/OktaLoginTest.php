@@ -9,7 +9,7 @@ uses(RefreshDatabase::class);
 /**
  * Browser (Pest v4) coverage of the pre-redirect login UX for a plain consumer
  * of the base package: the workbench login screen carries the Okta button, which
- * targets the base okta/login route that starts the OIDC redirect.
+ * targets the panel's login route that starts the OIDC redirect.
  */
 it('shows the Log In with Okta button on the login screen', function (): void {
     $page = visit('/login');

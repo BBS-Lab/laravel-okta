@@ -55,7 +55,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('services.okta', [
             'client_id' => 'test-client-id',
             'client_secret' => 'test-client-secret',
-            'redirect' => 'https://app.test/admin/okta/callback',
+            'redirect' => 'https://app.test/admin/authorization-code/callback',
             'base_url' => 'https://example.okta.com',
         ]);
     }
