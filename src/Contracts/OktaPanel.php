@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BBSLab\LaravelOkta\Contracts;
 
+use BBSLab\LaravelOkta\Enums\OktaRoute;
 use Illuminate\Http\Request;
 
 /**
@@ -56,6 +57,14 @@ interface OktaPanel
      * @return array<int, string>
      */
     public function middleware(): array;
+
+    /**
+     * The URI a given Okta route mounts at, relative to routePrefix() and without
+     * surrounding slashes (e.g. 'authorization-code/redirect'). Defaults to
+     * {@see OktaRoute::defaultPath()}; configurable by config for Nova, per panel
+     * for Filament. The route name stays {@see OktaRoute::routeName()} regardless.
+     */
+    public function path(OktaRoute $route): string;
 
     /**
      * The Socialite driver name this panel logs in through. Defaults to 'okta'

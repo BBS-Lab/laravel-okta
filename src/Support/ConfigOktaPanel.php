@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BBSLab\LaravelOkta\Support;
 
 use BBSLab\LaravelOkta\Contracts\OktaPanel;
+use BBSLab\LaravelOkta\Enums\OktaRoute;
 
 /**
  * An OktaPanel whose Okta settings come from the global config('okta.*') and the
@@ -18,6 +19,13 @@ abstract class ConfigOktaPanel implements OktaPanel
     public function socialiteDriver(): string
     {
         return 'okta';
+    }
+
+    public function path(OktaRoute $route): string
+    {
+        $configured = config('okta.paths.'.$route->value);
+
+        return is_string($configured) && $configured !== '' ? trim($configured, '/') : $route->defaultPath();
     }
 
     public function flashError(string $message): void

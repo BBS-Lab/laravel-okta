@@ -12,7 +12,9 @@ arch('the whole package declares strict types')
 
 arch('no class in the package is declared final')
     ->expect('BBSLab\LaravelOkta')
-    ->not->toBeFinal();
+    ->not->toBeFinal()
+    // Enums are implicitly final at the language level — the rule targets classes.
+    ->ignoring('BBSLab\LaravelOkta\Enums');
 
 arch('the package never depends on test or workbench code')
     ->expect('BBSLab\LaravelOkta')

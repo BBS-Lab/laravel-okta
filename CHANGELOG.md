@@ -2,6 +2,31 @@
 
 All notable changes to `bbs-lab/laravel-okta` will be documented in this file.
 
+## v2.0.0 - 2026-09-25
+
+### ⚠️ Breaking
+
+- **The Okta route paths changed** from `okta/*` to `authorization-code/*` (defaults):
+
+  | Purpose | Before | After (default) |
+  |---------|--------|-----------------|
+  | Login (start redirect) | `{prefix}/okta/login` | `{prefix}/authorization-code/redirect` |
+  | Callback (redirect URI) | `{prefix}/okta/callback` | `{prefix}/authorization-code/callback` |
+  | Logout | `{prefix}/okta/logout` | `{prefix}/authorization-code/logout` |
+  | Post-logout landing | `{prefix}/okta/callback/logout` | `{prefix}/authorization-code/callback/logout` |
+
+  **Action required:** update your Okta application's **Sign-in** and **Sign-out redirect URIs** in the Okta admin console to the new paths, or logins fail with `redirect_uri` mismatch (400). An explicit `services.{driver}.redirect` still wins and is unaffected.
+
+- The **route names are unchanged** (`{panel}.login`, `.callback`, `.logout`, `.callback.logout`), so `route()` callers, the login button and the derived redirect URI keep working without changes.
+- Added `OktaPanel::path(OktaRoute $route): string` to the contract — a breaking change **only** for code that implements `OktaPanel` directly (adapters extending `ConfigOktaPanel`, incl. `NullOktaPanel` and the Nova adapter, inherit it).
+
+### ✨ Added
+
+- **Configurable route paths.** Each path (the part after the panel's route prefix) is configurable and defaults to the value above:
+  - by config for the base package / Nova, under `okta.paths.*` (env `OKTA_LOGIN_PATH`, `OKTA_CALLBACK_PATH`, `OKTA_LOGOUT_PATH`, `OKTA_CALLBACK_LOGOUT_PATH`);
+  - per panel for Filament, via `OktaPlugin::make()->paths(...)`.
+- `BBSLab\LaravelOkta\Enums\OktaRoute` — the single source of truth for each route's config key, default path, route-name suffix and controller method.
+
 ## v1.1.0 - 2026-09-24
 
 ### ✨ Added

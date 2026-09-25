@@ -34,11 +34,11 @@ it('derives the redirect_uri from the panel callback route when none is configur
 
 it('honours an explicitly configured redirect_uri', function (): void {
     // An explicit value still wins (e.g. behind a reverse proxy).
-    config(['services.okta.redirect' => 'https://proxied.example/admin/okta/callback']);
+    config(['services.okta.redirect' => 'https://proxied.example/admin/authorization-code/callback']);
 
     $location = (string) $this->get(route('okta.login'))->headers->get('Location');
 
-    expect($location)->toContain('redirect_uri='.urlencode('https://proxied.example/admin/okta/callback'));
+    expect($location)->toContain('redirect_uri='.urlencode('https://proxied.example/admin/authorization-code/callback'));
 });
 
 it('flashes an error and returns to login when the driver cannot start the redirect', function (): void {

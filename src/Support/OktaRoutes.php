@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BBSLab\LaravelOkta\Support;
 
 use BBSLab\LaravelOkta\Contracts\OktaPanel;
+use BBSLab\LaravelOkta\Enums\OktaRoute;
 use BBSLab\LaravelOkta\Http\Controllers\OktaController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
  * calls this from the context where its panel path and middleware are known
  * (e.g. Nova::routes(), or a Filament panel's routes() callback), so the URIs,
  * middleware and route names all match the panel that owns them.
+ *
+ * Each route's URI comes from {@see OktaPanel::path()} (configurable, defaulting
+ * to {@see OktaRoute::defaultPath()}); its name stays {@see OktaRoute::routeName()}
+ * so route() callers are unaffected by a path change.
  */
 class OktaRoutes
 {
@@ -21,11 +26,11 @@ class OktaRoutes
         Route::prefix($panel->routePrefix())
             ->middleware($panel->middleware())
             ->name($panel->routeName().'.')
-            ->group(function () {
-                Route::get('okta/login', [OktaController::class, 'redirect'])->name('login');
-                Route::get('okta/callback', [OktaController::class, 'callback'])->name('callback');
-                Route::get('okta/logout', [OktaController::class, 'logout'])->name('logout');
-                Route::get('okta/callback/logout', [OktaController::class, 'callbackLogout'])->name('callback.logout');
+            ->group(function () use ($panel) {
+                foreach (OktaRoute::cases() as $route) {
+                    Route::get($panel->path($route), [OktaController::class, $route->controllerMethod()])
+                        ->name($route->routeName());
+                }
             });
     }
 }
