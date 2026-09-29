@@ -19,8 +19,8 @@ it('maps each route to its config key, default path, route name and controller m
     // route, config key (okta.paths.*), default path, route-name suffix, controller method
     'login' => [OktaRoute::Login, 'login', 'authorization-code/redirect', 'login', 'redirect'],
     'callback' => [OktaRoute::Callback, 'callback', 'authorization-code/callback', 'callback', 'callback'],
-    'logout' => [OktaRoute::Logout, 'logout', 'authorization-code/logout', 'logout', 'logout'],
-    'callback logout' => [OktaRoute::CallbackLogout, 'callback_logout', 'authorization-code/callback/logout', 'callback.logout', 'callbackLogout'],
+    'logout' => [OktaRoute::Logout, 'logout', 'authorization-code/logout/redirect', 'logout', 'logout'],
+    'callback logout' => [OktaRoute::CallbackLogout, 'callback_logout', 'authorization-code/logout', 'callback.logout', 'callbackLogout'],
 ]);
 
 it('covers every case in the mapping', function (): void {

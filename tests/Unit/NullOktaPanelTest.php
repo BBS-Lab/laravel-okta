@@ -45,8 +45,8 @@ it('mounts each okta route at its default authorization path', function (): void
 
     expect($panel->path(OktaRoute::Login))->toBe('authorization-code/redirect')
         ->and($panel->path(OktaRoute::Callback))->toBe('authorization-code/callback')
-        ->and($panel->path(OktaRoute::Logout))->toBe('authorization-code/logout')
-        ->and($panel->path(OktaRoute::CallbackLogout))->toBe('authorization-code/callback/logout');
+        ->and($panel->path(OktaRoute::Logout))->toBe('authorization-code/logout/redirect')
+        ->and($panel->path(OktaRoute::CallbackLogout))->toBe('authorization-code/logout');
 });
 
 it('reads a configured path over the default', function (): void {

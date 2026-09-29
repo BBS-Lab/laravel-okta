@@ -25,14 +25,23 @@ enum OktaRoute: string
     /**
      * The default URI (relative to the panel's route prefix, without surrounding
      * slashes) this route mounts at.
+     *
+     * Deliberate name<->URI inversion on the logout pair: the post-logout LANDING
+     * (CallbackLogout — the value sent to Okta as the sign-out redirect URI) sits at
+     * the short 'authorization-code/logout', while the RP-initiated INITIATOR
+     * (Logout — OktaController::logout(), which starts the OIDC end-session) sits at
+     * the nested 'authorization-code/logout/redirect'. This is intentional: the
+     * route NAMES stay stable, so route('{panel}.logout') still *initiates* logout.
+     * Do NOT "correct" the pairing — swapping them would move the sign-out redirect
+     * URI (breaking every Okta whitelist) and flip what route('{panel}.logout') does.
      */
     public function defaultPath(): string
     {
         return match ($this) {
             self::Login => 'authorization-code/redirect',
             self::Callback => 'authorization-code/callback',
-            self::Logout => 'authorization-code/logout',
-            self::CallbackLogout => 'authorization-code/callback/logout',
+            self::Logout => 'authorization-code/logout/redirect',
+            self::CallbackLogout => 'authorization-code/logout',
         };
     }
 
