@@ -2,6 +2,22 @@
 
 All notable changes to `bbs-lab/laravel-okta` will be documented in this file.
 
+## v3.0.0 - 2026-09-29
+
+### ⚠️ Breaking
+
+- **The two logout route paths moved** so the post-logout landing (the OIDC sign-out redirect URI) gets the short, primary path:
+
+  | Purpose | v2.0.0 | v3.0.0 (default) |
+  |---------|--------|------------------|
+  | Post-logout landing = **Sign-out redirect URI** (`{panel}.callback.logout`) | `{prefix}/authorization-code/callback/logout` | `{prefix}/authorization-code/logout` |
+  | Logout initiator — starts the Okta end-session (`{panel}.logout`) | `{prefix}/authorization-code/logout` | `{prefix}/authorization-code/logout/redirect` |
+
+  **Action required:** update your Okta application's **Sign-out redirect URI** to `{APP_URL}/{prefix}/authorization-code/logout`. Add the new value in Okta *before* deploying (Okta allows several), then remove the old one, to avoid a window where SSO logout 400s. The **Sign-in** side is unchanged.
+
+- The **route names are unchanged** (`{panel}.logout`, `{panel}.callback.logout`), so `route()` callers, the login/logout links and `OktaController` are all untouched — `route('{panel}.logout')` still *initiates* logout. This produces a deliberate name↔URI inversion (`{panel}.logout` → `.../logout/redirect`, `{panel}.callback.logout` → `.../logout`), documented on `OktaRoute::defaultPath()`; do not "correct" it.
+- Env semantics shifted: `OKTA_LOGOUT_PATH` now backs the initiator (`…/logout/redirect`), `OKTA_CALLBACK_LOGOUT_PATH` the landing (`…/logout`). If you pinned either, adjust it.
+
 ## v2.0.0 - 2026-09-25
 
 ### ⚠️ Breaking

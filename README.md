@@ -33,7 +33,7 @@ The service provider is auto-discovered.
 In your Okta admin, create an **OIDC / Web** application and set:
 
 - **Sign-in redirect URI**: `{APP_URL}/{prefix}/authorization-code/callback`
-- **Sign-out redirect URI**: `{APP_URL}/{prefix}/authorization-code/callback/logout`
+- **Sign-out redirect URI**: `{APP_URL}/{prefix}/authorization-code/logout`
 
 where `{prefix}` is the panel's route prefix (empty for the base package's default plain-application panel; the panel path for an adapter). These paths are configurable — see [Routes](#routes).
 
@@ -73,10 +73,12 @@ An adapter (or the base package on its own) mounts four routes for its panel via
 |-------|------|---------|
 | `GET authorization-code/redirect` | `{panel}.login` | Redirects to Okta (start login) — the URL your Okta button points at. |
 | `GET authorization-code/callback` | `{panel}.callback` | Login callback — resolves the user and logs them in (this is the Sign-in redirect URI target). |
-| `GET authorization-code/logout` | `{panel}.logout` | Logs out locally, and — when `sso_logout` is on — via Okta's OIDC end-session (start logout). |
-| `GET authorization-code/callback/logout` | `{panel}.callback.logout` | Okta's post-logout landing (sign-out redirect). |
+| `GET authorization-code/logout/redirect` | `{panel}.logout` | Logs out locally, and — when `sso_logout` is on — via Okta's OIDC end-session (start logout). |
+| `GET authorization-code/logout` | `{panel}.callback.logout` | Okta's post-logout landing (this is the Sign-out redirect URI target). |
 
 `{panel}` is the panel's route-name prefix (`okta` for the default panel, `nova-okta` / `filament-okta` for the adapters). Paths are mounted under the panel's route prefix, so the login route for a Nova panel at `/nova` is `nova/authorization-code/redirect`.
+
+> **Logout name↔URI inversion (by design).** `{panel}.logout` *initiates* logout but mounts at the nested `authorization-code/logout/redirect`, while the post-logout landing `{panel}.callback.logout` mounts at the short `authorization-code/logout` (the value sent to Okta as the sign-out redirect URI). This keeps `route('{panel}.logout')` meaning "start logout" — reference routes by name, not by hard-coding a URI, and do not swap the pairing.
 
 **The paths are configurable** (the route names never change, so `route('{panel}.login')` and the derived redirect URI follow automatically). Set them under `okta.paths` in config (see below) or, for Filament, per panel with `OktaPlugin::make()->paths(...)`. Changing the callback path changes the OIDC redirect URI you must whitelist in Okta.
 
@@ -92,14 +94,16 @@ php artisan vendor:publish --tag=okta-config
 return [
     // The URI each Okta route mounts at, relative to the panel's route prefix.
     // 'login' is where your Okta button points (it starts the redirect to Okta);
-    // 'callback' is the OIDC redirect_uri you whitelist in Okta. The route names
-    // never change, so route() callers are unaffected. For Filament, set these
-    // per panel with OktaPlugin::make()->paths(...) instead.
+    // 'callback' is the OIDC redirect_uri you whitelist in Okta. 'callback_logout'
+    // is the sign-out redirect URI (post-logout landing); 'logout' is the route
+    // that *starts* the Okta end-session. The route names never change, so route()
+    // callers are unaffected. For Filament, set these per panel with
+    // OktaPlugin::make()->paths(...) instead.
     'paths' => [
         'login' => env('OKTA_LOGIN_PATH', 'authorization-code/redirect'),
         'callback' => env('OKTA_CALLBACK_PATH', 'authorization-code/callback'),
-        'logout' => env('OKTA_LOGOUT_PATH', 'authorization-code/logout'),
-        'callback_logout' => env('OKTA_CALLBACK_LOGOUT_PATH', 'authorization-code/callback/logout'),
+        'logout' => env('OKTA_LOGOUT_PATH', 'authorization-code/logout/redirect'),
+        'callback_logout' => env('OKTA_CALLBACK_LOGOUT_PATH', 'authorization-code/logout'),
     ],
 
     // Logout also ends the Okta session (OIDC end-session / single sign-out).

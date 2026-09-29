@@ -24,8 +24,10 @@ it('mounts each okta route at its default authorization path', function (): void
     // The suite's FakeOktaPanel mounts under the 'admin' prefix with routeName 'okta'.
     expect(routeUri('okta.login'))->toBe('admin/authorization-code/redirect')
         ->and(routeUri('okta.callback'))->toBe('admin/authorization-code/callback')
-        ->and(routeUri('okta.logout'))->toBe('admin/authorization-code/logout')
-        ->and(routeUri('okta.callback.logout'))->toBe('admin/authorization-code/callback/logout');
+        // Name<->URI inversion (deliberate): .logout is the initiator (nested),
+        // .callback.logout is the post-logout landing (short).
+        ->and(routeUri('okta.logout'))->toBe('admin/authorization-code/logout/redirect')
+        ->and(routeUri('okta.callback.logout'))->toBe('admin/authorization-code/logout');
 });
 
 it('keeps the derived redirect_uri pointing at the (moved) callback route', function (): void {
@@ -57,5 +59,5 @@ it('registers each route at the path the panel returns', function (): void {
 
     expect(routeUri('custom-okta.login'))->toBe('admin/sso/start')
         ->and(routeUri('custom-okta.callback'))->toBe('admin/authorization-code/callback')
-        ->and(routeUri('custom-okta.callback.logout'))->toBe('admin/authorization-code/callback/logout');
+        ->and(routeUri('custom-okta.callback.logout'))->toBe('admin/authorization-code/logout');
 });
